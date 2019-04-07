@@ -49,8 +49,8 @@ realed attributes,
   * filter, a factor of "gravity" and "body",
   * axial, a factor of sensor axial, with values "X", "Y" and "Z"
   * variable, a factor of variables that were estimated from these signals, see
-  [features_info.txt](data/features_info.txt) for more detail  
-Anyway, those tidy data steps are not required to finished the project.
+  [features_info.txt](data/features_info.txt) for more detail  Anyway, those tidy data steps are not required
+to finished the project.
 1. The last step is to calculate the mean of each variables on subject and activity. This is done by combine
    the subject and activity into one factor using ``group_by``, and then calculate mean over the value.
   
