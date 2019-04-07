@@ -75,5 +75,5 @@ names(avg_subj_act) <- c("subjec_activity", "mean_of_std", "mean_of_mean")
 head(avg_subj_act)
 tail(avg_subj_act)
 
-write.csv(avg_subj_act, file="average_of_mean_and_std_over_subject_and_activity.csv", row.names=FALSE)
+write.table(avg_subj_act, file="average_of_mean_and_std_over_subject_and_activity.txt", row.names=FALSE)
 
