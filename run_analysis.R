@@ -20,6 +20,7 @@ load_feature <- function() {
              ) %>%
           mutate(feature = gsub("\\(\\)", "", feature)) %>%
           mutate(feature = gsub("-",".", feature)) %>%
+          mutate(feature = gsub("BodyBody", "Body", feature)) %>%
           pull(feature)
 }
 
@@ -39,7 +40,6 @@ load_dataset <- function(set, act_label, feature) {
 
 act_label <- load_activity_label()
 feature   <- load_feature()
-
 # load test and train dataset with descriptive activity name and columns names.
 test  <- load_dataset('test', act_label, feature)
 train <- load_dataset('train', act_label, feature)
@@ -57,23 +57,25 @@ select_ds <- merge_ds %>%
 # Create dataset with factor colum 'variable' with labels "mean", "std", 
 # and factor column 'sensor' with labels mutate from select_cols by removing "mean", and "std" words.
 melt_ds <- melt(select_ds, id=id_cols, measure.vars=select_cols)
-melt_ds$sensor <- as.character(melt_ds$variable)
-dataset <- melt_ds %>%
-        mutate(variable = factor( str_detect(sensor, "\\.mean"), labels = c("std", "mean") )) %>%
-        mutate(sensor = factor( str_replace(sensor, "\\.(mean|std)(\\.|$)", "") ))
+melt_ds$signal <- as.character(melt_ds$variable)
 
-head(dataset)
-tail(dataset)
+tidy_ds <- melt_ds %>%
+          mutate(domain   = factor( str_detect(signal, "^t"), labels=c("freq", "time") )) %>%
+          mutate(filter   = factor( str_detect(signal, "Body"), labels=c("gravity", "body") )) %>%
+          mutate(sensor   = factor( str_detect(signal, "Acc"), labels=c("gyro", "accel") )) %>%
+          mutate(axial    = factor( substr(signal, nchar(signal), nchar(signal) ) )) %>%
+          mutate(variable = factor( str_detect(signal, "mean"), labels=c("std", "mean") )) %>%
+          mutate(jerk = factor( str_detect(signal, "Jerk"), labels=c("no", "yes") )) %>%
+          mutate(magniture = factor( str_detect(signal, "Mag"), labels=c("no", "yes") )) %>%
+          select(-signal)
 
 # Create a second, independent tidy data set with the average of each variable 
 # of each activity and each subject
-avg_subj_act <- dataset %>%
-        mutate(subject_activity = factor(paste('subject', subject, activity, sep='_' ))) %>%
-        dcast(subject_activity ~ variable, mean)
-names(avg_subj_act) <- c("subjec_activity", "mean_of_std", "mean_of_mean")
+mean_ds <- tidy_ds %>%
+        group_by(subject, activity) %>%
+        summarize(mean = mean(value))
 
-head(avg_subj_act)
-tail(avg_subj_act)
+head(mean_ds)
 
-write.table(avg_subj_act, file="average_of_mean_and_std_over_subject_and_activity.txt", row.names=FALSE)
+write.table(mean_ds, file="mean_dataset.txt", row.names=FALSE)
 
