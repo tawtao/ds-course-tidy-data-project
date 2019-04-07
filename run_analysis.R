@@ -23,7 +23,6 @@ load_feature <- function() {
           pull(feature)
 }
 
-
 load_dataset <- function(set, act_label, feature) {
   path <- paste('data', set, sep='/')
 
@@ -34,12 +33,8 @@ load_dataset <- function(set, act_label, feature) {
   activity <- read.table( paste(path,'/','y_',set,'.txt', sep=''), col.names=c("code")) %>% 
                 mutate(activity = act_label[code]) %>%
                 pull(activity)
-
   data <- read.table(paste(path,'/','X_',set,'.txt', sep=''), col.names = feature)
-
-  dataset <- factor(rep(set, nrow(data)), levels=c("test","train"))
-
-  data.frame(subject, dataset, activity, data) 
+  data.frame(subject, activity, data) 
 }
 
 act_label <- load_activity_label()
@@ -50,9 +45,9 @@ test  <- load_dataset('test', act_label, feature)
 train <- load_dataset('train', act_label, feature)
 
 # merge test and train dataset
-merge_ds <- bind_rows(test, train)
+merge_ds <- bind_rows(test, train) 
 
-id_cols     = names(merge_ds)[1:3]
+id_cols     = names(merge_ds)[1:2]
 select_cols = grep("(mean|std)(\\.|$)", feature, value=TRUE)
 
 # Extracts only the measurements on the mean and standard deviation
@@ -67,11 +62,18 @@ dataset <- melt_ds %>%
         mutate(variable = factor( str_detect(sensor, "\\.mean"), labels = c("std", "mean") )) %>%
         mutate(sensor = factor( str_replace(sensor, "\\.(mean|std)(\\.|$)", "") ))
 
+head(dataset)
+tail(dataset)
+
 # Create a second, independent tidy data set with the average of each variable 
 # of each activity and each subject
 avg_subj_act <- dataset %>%
         mutate(subject_activity = factor(paste('subject', subject, activity, sep='_' ))) %>%
         dcast(subject_activity ~ variable, mean)
 names(avg_subj_act) <- c("subjec_activity", "mean_of_std", "mean_of_mean")
+
+head(avg_subj_act)
+tail(avg_subj_act)
+
 write.csv(avg_subj_act, file="average_of_mean_and_std_over_subject_and_activity.csv", row.names=FALSE)
-print("Done.")
+
