@@ -1,4 +1,5 @@
 library(dplyr)
+library(reshape2)
 library(stringr)
 
 load_activity_label <- function() {
@@ -41,51 +42,36 @@ load_dataset <- function(set, act_label, feature) {
   data.frame(subject, dataset, activity, data) 
 }
 
-which_derivation <- function(var) {
-  dv = c("base", "jerk", "magiture")
-  ms = c()
-}
+act_label <- load_activity_label()
+feature   <- load_feature()
 
-act_label <- load_activity_labels()
-act_label
+# load test and train dataset with descriptive activity name and columns names.
+test  <- load_dataset('test', act_label, feature)
+train <- load_dataset('train', act_label, feature)
 
-# loading default column names for the raw dataset
-feature  <- load_feature()
+# merge test and train dataset
+merge_ds <- bind_rows(test, train)
 
-test     <- load_dataset('test', act_label, feature)
-train    <- load_dataset('train', act_label, feature)
-
-# Step 1: merge test and train dataset
-merge_data <- bind_rows(test, train)
-
-base_cols   = c("subject", "dataset", "activity")
+id_cols     = names(merge_ds)[1:3]
 select_cols = grep("(mean|std)(\\.|$)", feature, value=TRUE)
 
-# Step 2: Extracts only the measurements on the mean and standard deviation
-select_dataset <- merge_data %>% 
-                    select( c(base_cols,select_cols) )
+# Extracts only the measurements on the mean and standard deviation
+select_ds <- merge_ds %>% 
+  select( c(id_cols, select_cols) )
 
-# Step 3: Used descriptive activity names to name the activites in the dataset (done in load_dataset)
-print(select_cols)
-
-# Step 4: Approriately labels the dataset with descriptive variable names
-melt_dataset <- melt(select_dataset, id=base_cols, measure.vars=select_cols)
-melt_dataset$sensor <- as.character(melt_dataset$variable)
-head(melt_dataset$sensor)
-
-        #mutate(filter = factor( str_detect(signal, ".Body"), labels = c("gravity", "body") )) %>%
-        #mutate(domain = factor( str_detect(signal, "^t"), labels = c("frequency", "time") )) %>%
-        #mutate(sensor = factor( str_detect(signal, ".Acc"), labels = c("gyro", "accel") )) %>%
-        #mutate(axial = factor( substr(signal, nchar(signal),nchar(signal)) )) %>%
-
-dataset <- melt_dataset %>%
+# Create dataset with factor colum 'variable' with labels "mean", "std", 
+# and factor column 'sensor' with labels mutate from select_cols by removing "mean", and "std" words.
+melt_ds <- melt(select_ds, id=id_cols, measure.vars=select_cols)
+melt_ds$sensor <- as.character(melt_ds$variable)
+dataset <- melt_ds %>%
         mutate(variable = factor( str_detect(sensor, "\\.mean"), labels = c("std", "mean") )) %>%
         mutate(sensor = factor( str_replace(sensor, "\\.(mean|std)(\\.|$)", "") ))
-head(dataset)
-# Step 5: create a second, independent tidy data set with the average of each variable 
-#         of each activity and each subject
 
+# Create a second, independent tidy data set with the average of each variable 
+# of each activity and each subject
 avg_subj_act <- dataset %>%
         mutate(subject_activity = factor(paste('subject', subject, activity, sep='_' ))) %>%
         dcast(subject_activity ~ variable, mean)
-head(avg_subj_act, 50)
+names(avg_subj_act) <- c("subjec_activity", "mean_of_std", "mean_of_mean")
+write.csv(avg_subj_act, file="average_of_mean_and_std_over_subject_and_activity.csv", row.names=FALSE)
+print("Done.")
