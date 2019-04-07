@@ -5,17 +5,17 @@ The tidy dataset, resulted in step 4, has 4 columns.
 * **subject**:  A number to identify the subject who carried out the experiment
   * values: integer from 1 to 6
 * **activity**: An activity that subject done in the experiment. See
-  [activity_labels.txt](data/activity_labels.txt) for more information.
+  [activity_labels.txt](UCI%20HAR%20Dataset/activity_labels.txt) for more information.
   * values: ``walking, walking_upstairs, walking_downstairs, sitting, standing, laying``
-* **variable**: A variable that were estimated from signals. See [features_info.txt](data/features_info.txt)
-  for more information.
+* **variable**: A variable that were estimated from signals. See
+  [features_info.txt](I%20HAR%20Dataset/features_info.txt) for more information.
   * values: mean = mean value, std = standard deviation
 * **value**: The value of variable of the signals 
   * values: numeric
-* **sensor**: The sensor that estimated the signals. See [features_info.txt](data/features_info.txt).
-  for more information.
-  * values: The values is from the features listed in [features.txt](data/features.txt), and then
-    removed "mean()" and "std()" from the feature name. For example ``tBodyAcc-mean()-X`` become
+* **sensor**: The sensor that estimated the signals. See
+  [features_info.txt](UCI%20HAR%20Dataset/features_info.txt) for more information.
+  * values: The values is from the features listed in [features.txt](UCI%20HAR%20Dataset/features.txt), and
+    then removed "mean()" and "std()" from the feature name. For example ``tBodyAcc-mean()-X`` become
     ``tBodyAccX``, etc.
 
 #### Step 5: Average dataset
