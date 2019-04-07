@@ -8,7 +8,7 @@ The tidy dataset, resulted in step 4, has 4 columns.
   [activity_labels.txt](UCI%20HAR%20Dataset/activity_labels.txt) for more information.
   * values: ``walking, walking_upstairs, walking_downstairs, sitting, standing, laying``
 * **variable**: A variable that were estimated from signals. See
-  [features_info.txt](I%20HAR%20Dataset/features_info.txt) for more information.
+  [features_info.txt](UCI%20HAR%20Dataset/features_info.txt) for more information.
   * values: mean = mean value, std = standard deviation
 * **value**: The value of variable of the signals 
   * values: numeric
