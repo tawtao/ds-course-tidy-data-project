@@ -1,21 +1,28 @@
 ## Data Science Specialist Course: Tidy Data Project
 
-This project contains R script that perform tidy and analysis on ``UCI HAR Dataset`` in subdirectory ``UCI HAR
-Dataset``. It has a link ``data`, please don't remove it.
+This project contains R script that perform tidy and analysis on ``UCI HAR Dataset`` in subdirectory ``data``
 
-The script is in ``run_analysis.R``, and the [code_book.md](code_book.md) described the dataset in detail.
+The script is in ``run_analysis.R``, and the [code_book.md](code_book.md) described the result dataset in
+detail.  
+
+#### File list:
+ * README.md: This file.
+ * run_analysis.R: The analysis R-script file.
+ * code_book.md: The code_book describes the result dataset.
+ * mean_dataset.txt: The result dataset.
 
 #### Running the script: 
-This R script was developed under R version 3.5.3 (2019-03-11) on linux. The
-simpliest way to run the script is to open command line and change directory to the directory that contain
-``run_analysis.R`` and issue command 
+
+The R script was developed under R version 3.5.3 (2019-03-11) on linux. The simpliest way to run the script is
+to open command line and change directory to the directory that contain ``run_analysis.R`` and issue command 
 
 ```$ Rscript run_analysis.R ``` 
 
-The script will create text file named
-``average_of_mean_And_std_over_subject_and_activity.txt``. Also the script will print out some part datasets.
+The script will create text file named ``mean_dataset.txt``, as described in [codebook.txt](codebook.txt).
 
-#### Inner working of the script: The script is using packages ``dplyr``,``reshape2`` and ``stringr``
+#### Inner working of the script: 
+
+The script is using packages ``dplyr``,``reshape2`` and ``stringr``
 
 There are five steps within the script:
 1. loading ``test`` and ``train`` dataset. The loading is perform by function ``load_dataset``.  The function
@@ -34,13 +41,16 @@ get simplify by remove ``()`` and change ``-`` to ``.``.
    done by create id_cols, a vector of "subject" and "activity", and select_cols, a vector of the column that
 have ".mean", and ".std" and ending with "." or end of string. The using this two vectors to create
 ``select_ds`` from the ``merge_ds`` from step 2
-1. Using ``melt`` to create ``melt_ds``, then we create separate variable ``mean`` and ``std`` from the other
-   ``sensor`` variables. The result is almost tidy dataset with described in [code_book.txt](code_book.txt).
-from Since we do not analyze data on other variables other than ``mean`` and ``std``, there is no need to tidy
-the data further.
+1. Using ``melt`` to create ``melt_ds``, which create two columns, variable and value. Using the column
+   variable, now we can tidy the dataset clean and meaningful way by create separate columns for each sensor
+realed attributes, 
+  * domain, a factor of "time" and "freq", 
+  * sensor, a factor of "gyro" and "accel",
+  * filter, a factor of "gravity" and "body",
+  * axial, a factor of sensor axial, with values "X", "Y" and "Z"
+  * variable, a factor of variables that were estimated from these signals, see
+  [features_info.txt](data/features_info.txt) for more detail  
+Anyway, those tidy data steps are not required to finished the project.
 1. The last step is to calculate the mean of each variables on subject and activity. This is done by combine
-   the subject and activity into one factor, named ``subject_activity``. The value of this column is the
-combination of value of subject and activity columns which described in the [code_book.txt](code_book.txt).
-Then using ``dcast`` function to calculate the mean of mean and std. At the end, the columns are named
-appropriately.
+   the subject and activity into one factor using ``group_by``, and then calculate mean over the value.
   
